@@ -13,9 +13,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 
 var isVerbose = false
+var horizLine = "\n************************\n"
 
-fun printOut(outString: Any) {
-    if (isVerbose) {
+fun printOut(outString: Any, overrideVerbose: Boolean = false) {
+    if (isVerbose || overrideVerbose) {
         if (outString.toString().subSequence(0, 2).contains('>')) {
             println(outString)
             return
@@ -42,31 +43,37 @@ fun main() = runBlocking {
     val activeModel = openAI.model(modelId = ModelId(codeDaVinci))
     printOut(activeModel)
 
-    printOut("\n>️ Creating completion...")
+    val promptOut = "\"\"\"Write a python script to find all prime numbers from 0 to 1000\"\"\""
+
+    printOut("\n>️ Creating completion...", overrideVerbose = true)
     val completionRequest = CompletionRequest(
         model = activeModel.id,
-        prompt = "Somebody once told me the world is gonna roll me"
+        prompt = promptOut,
+        maxTokens = 2048,
     )
-    openAI.completion(completionRequest).choices.forEach(::println)
+    printOut("PROMPT:\n$promptOut", overrideVerbose = true)
+    println(horizLine + horizLine)
+    println(openAI.completion(completionRequest).choices[0].text)
+    println(horizLine + horizLine)
 
-    printOut("\n>️ Creating completion stream...")
-    openAI.completions(completionRequest)
-        .onEach { print(it.choices[0].text) }
-        .onCompletion { println() }
-        .launchIn(this)
-        .join()
+//    printOut("\n>️ Creating completion stream...", overrideVerbose = true)
+//    openAI.completions(completionRequest)
+//        .onEach { print(it.choices[0].text) }
+//        .onCompletion { println() }
+//        .launchIn(this)
+//        .join()
 
-    printOut("\n> Read files...")
-    val files = openAI.files()
-    printOut(files)
+//    printOut("\n> Read files...")
+//    val files = openAI.files()
+//    printOut(files)
 
-    printOut("\n> Create moderations...")
-    val moderation = openAI.moderations(
-        request = ModerationRequest(
-            input = "I want to kill them."
-        )
-    )
-    printOut(moderation)
+//    printOut("\n> Create moderations...")
+//    val moderation = openAI.moderations(
+//        request = ModerationRequest(
+//            input = "I want to kill them."
+//        )
+//    )
+//    printOut(moderation)
 
 //    printOut("\n> Create images...")
 //    val images = openAI.image(
