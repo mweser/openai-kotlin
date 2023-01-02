@@ -7,11 +7,11 @@ import com.aallam.openai.client.OpenAI
 import kotlinx.coroutines.runBlocking
 
 var isVerbose = false
-var horizLine = "\n************************\n"
+var horizLine = "\n#************************\n"
 var useCommentFormat = true
 
 fun sandwich(string: String): String {
-    return "\"\"\"\n$string\n\"\"\""
+    return "\"\"\"\n$string\n\"\"\"\n"
 
 }
 
@@ -21,7 +21,7 @@ fun printOut(outString: Any, overrideVerbose: Boolean = false) {
             println(outString)
             return
         }
-        println("> $outString")
+        println("$outString")
     }
 }
 
@@ -51,10 +51,7 @@ fun main() = runBlocking {
 
     val promptBody = """
         |# Python 3 
-        |1. Prompt user for an integer
-        |2. If input is not an integer, provide a hint about what an integer is
-        |3. Prompt again, until user enters valid integer or types 'exit'
-        |4. Once user enters a valid integer, display "HURRAH! YOU'VE DONE IT!"
+        |Write a script that fetches the latest ETH price and display it 
     """.trimMargin()
 
 
@@ -75,8 +72,8 @@ fun main() = runBlocking {
     val completionOut = openAI.completion(completionRequest)
     val resultText = completionOut.choices[0].text.trim()
 
-    printWrap("PROMPT:\n$promptOut")
-    printWrap(resultText)
+    printWrap("# PROMPT:\n$promptOut")
+    printOut(resultText, overrideVerbose = true)
 
 //    printOut("\n>️ Creating completion stream...", overrideVerbose = true)
 //    openAI.completions(completionRequest)
