@@ -12,53 +12,69 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 
+var isVerbose = false
+
+fun printOut(outString: Any) {
+    if (isVerbose) {
+        if (outString.toString().subSequence(0, 2).contains('>')) {
+            println(outString)
+            return
+        }
+        println("> $outString")
+    }
+}
+
 @OptIn(ExperimentalOpenAI::class)
 fun main() = runBlocking {
     val apiKey = System.getenv("OPENAI_API_KEY")
     val token = requireNotNull(apiKey) { "OPENAI_API_KEY environment variable must be set." }
     val openAI = OpenAI(token)
 
-    println("> Getting available engines...")
+    printOut("> Getting available engines...")
     openAI.models().forEach(::println)
 
-    println("\n> Getting ada engine...")
+    printOut("\n> Getting ada engine...")
 
-    val ada = openAI.model(modelId = ModelId("text-ada-001"))
-    println(ada)
+    val adaModel = "text-ada-001"
+    val codeDaVinci = "code-davinci-002"
+    val daVinciBeast = "text-davinci-003"
 
-    println("\n>️ Creating completion...")
+    val activeModel = openAI.model(modelId = ModelId(codeDaVinci))
+    printOut(activeModel)
+
+    printOut("\n>️ Creating completion...")
     val completionRequest = CompletionRequest(
-        model = ada.id,
+        model = activeModel.id,
         prompt = "Somebody once told me the world is gonna roll me"
     )
     openAI.completion(completionRequest).choices.forEach(::println)
 
-    println("\n>️ Creating completion stream...")
+    printOut("\n>️ Creating completion stream...")
     openAI.completions(completionRequest)
         .onEach { print(it.choices[0].text) }
         .onCompletion { println() }
         .launchIn(this)
         .join()
 
-    println("\n> Read files...")
+    printOut("\n> Read files...")
     val files = openAI.files()
-    println(files)
+    printOut(files)
 
-    println("\n> Create moderations...")
+    printOut("\n> Create moderations...")
     val moderation = openAI.moderations(
         request = ModerationRequest(
             input = "I want to kill them."
         )
     )
-    println(moderation)
+    printOut(moderation)
 
-    println("\n> Create images...")
-    val images = openAI.image(
-        creation = ImageCreationURL(
-            prompt = "A cute baby sea otter",
-            n = 2,
-            size = ImageSize.is1024x1024
-        )
-    )
-    println(images)
+//    printOut("\n> Create images...")
+//    val images = openAI.image(
+//        creation = ImageCreationURL(
+//            prompt = "A cute baby sea otter",
+//            n = 2,
+//            size = ImageSize.is1024x1024
+//        )
+//    )
+//    printOut(images)
 }
