@@ -40,23 +40,21 @@ fun main() = runBlocking {
 
     printOut("\n> Getting ada engine...")
 
-    val adaModel = "text-ada-001"
     val codeDaVinci = "code-davinci-002"
     val codeCushman = "code-cushman-001"
+
+    val adaModel = "text-ada-001"
     val daVinciBeast = "text-davinci-003"
 
-    val activeModel = openAI.model(modelId = ModelId(codeDaVinci))
+    val activeModel = openAI.model(modelId = ModelId(codeCushman))
     printOut(activeModel)
 
     val promptBody = """
         |# Python 3 
-        |1. Ensure sqlite database file exists, if not, create it
-        |2. Use sqlite
-        |3. Write a script that takes in a user name and phone number, then stores to a sqlite database.
-        |4. It should prompt for 3 different users.
-        |5. If a number already exists in the database, display an error.
-        |6. If the number 911 is used, display 'FIRE!'
-        |7. Continue looping application until user types 'exit'
+        |1. Prompt user for an integer
+        |2. If input is not an integer, provide a hint about what an integer is
+        |3. Prompt again, until user enters valid integer or types 'exit'
+        |4. Once user enters a valid integer, display "HURRAH! YOU'VE DONE IT!"
     """.trimMargin()
 
 
